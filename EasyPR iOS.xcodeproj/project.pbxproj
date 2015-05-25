@@ -154,8 +154,8 @@
 		5338B0461AECAB8D003B79AD /* plate_judge.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AFC21AECAB8D003B79AD /* plate_judge.jpg */; };
 		5338B0471AECAB8D003B79AD /* plate_locate.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AFC31AECAB8D003B79AD /* plate_locate.jpg */; };
 		5338B0481AECAB8D003B79AD /* plate_recognize.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AFC41AECAB8D003B79AD /* plate_recognize.jpg */; };
-		5338B0491AECAB8D003B79AD /* test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AFC51AECAB8D003B79AD /* test.jpg */; };
 		5338B04A1AECAB8D003B79AD /* 使用说明.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5338AFC61AECAB8D003B79AD /* 使用说明.txt */; };
+		53BB0FEE1B12B1E100A31F23 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53BB0FED1B12B1E100A31F23 /* opencv2.framework */; };
 		53CB66CA1A7BF694007B7FEB /* ann.xml in Resources */ = {isa = PBXBuildFile; fileRef = 53CB66C61A7BF693007B7FEB /* ann.xml */; };
 		53CB66CB1A7BF694007B7FEB /* haarcascade_frontalface_alt_tree.xml in Resources */ = {isa = PBXBuildFile; fileRef = 53CB66C71A7BF694007B7FEB /* haarcascade_frontalface_alt_tree.xml */; };
 		53CB66CC1A7BF694007B7FEB /* haarcascade_frontalface_default.xml in Resources */ = {isa = PBXBuildFile; fileRef = 53CB66C81A7BF694007B7FEB /* haarcascade_frontalface_default.xml */; };
@@ -339,6 +339,7 @@
 		5338AFC41AECAB8D003B79AD /* plate_recognize.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = plate_recognize.jpg; sourceTree = "<group>"; };
 		5338AFC51AECAB8D003B79AD /* test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test.jpg; sourceTree = "<group>"; };
 		5338AFC61AECAB8D003B79AD /* 使用说明.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "使用说明.txt"; sourceTree = "<group>"; };
+		53BB0FED1B12B1E100A31F23 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		53CB66C61A7BF693007B7FEB /* ann.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ann.xml; sourceTree = "<group>"; };
 		53CB66C71A7BF694007B7FEB /* haarcascade_frontalface_alt_tree.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_frontalface_alt_tree.xml; sourceTree = "<group>"; };
 		53CB66C81A7BF694007B7FEB /* haarcascade_frontalface_default.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_frontalface_default.xml; sourceTree = "<group>"; };
@@ -372,6 +373,7 @@
 			files = (
 				53EBCD001A7B447A002F67C1 /* CoreGraphics.framework in Frameworks */,
 				53EBCCFF1A7B447A002F67C1 /* Foundation.framework in Frameworks */,
+				53BB0FEE1B12B1E100A31F23 /* opencv2.framework in Frameworks */,
 				53EBCCFE1A7B447A002F67C1 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -595,6 +597,7 @@
 		53EBCCC31A7B445E002F67C1 = {
 			isa = PBXGroup;
 			children = (
+				53BB0FED1B12B1E100A31F23 /* opencv2.framework */,
 				5338AF401AECAB8C003B79AD /* image */,
 				5338AF261AEC9C63003B79AD /* include */,
 				53007F651AE9D618009CF393 /* core */,
@@ -685,7 +688,7 @@
 		53EBCCC41A7B445E002F67C1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = zhoushiwei;
 				TargetAttributes = {
 					53EBCCCB1A7B445E002F67C1 = {
@@ -816,7 +819,6 @@
 				5338AF3E1AECA813003B79AD /* AppIcon60x60@2x.png in Resources */,
 				5338AFF21AECAB8D003B79AD /* 湘A0PC37.jpg in Resources */,
 				5338AFF91AECAB8D003B79AD /* 湘A5RM87.jpg in Resources */,
-				5338B0491AECAB8D003B79AD /* test.jpg in Resources */,
 				5338B00A1AECAB8D003B79AD /* 皖A22T43.jpg in Resources */,
 				5338B02B1AECAB8D003B79AD /* 苏B551QV.jpg in Resources */,
 				5338AFFC1AECAB8D003B79AD /* 湘A9YU86.jpg in Resources */,
