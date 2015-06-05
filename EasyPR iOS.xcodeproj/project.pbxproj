@@ -28,7 +28,6 @@
 		5338AFC81AECAB8D003B79AD /* chars_identify.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF421AECAB8C003B79AD /* chars_identify.jpg */; };
 		5338AFC91AECAB8D003B79AD /* chars_recognise.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF431AECAB8C003B79AD /* chars_recognise.jpg */; };
 		5338AFCA1AECAB8D003B79AD /* chars_segment.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF441AECAB8C003B79AD /* chars_segment.jpg */; };
-		5338AFCB1AECAB8D003B79AD /* GDSL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF451AECAB8C003B79AD /* GDSL.txt */; };
 		5338AFCC1AECAB8D003B79AD /* 京A88731.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF471AECAB8C003B79AD /* 京A88731.jpg */; };
 		5338AFCD1AECAB8D003B79AD /* 京CX8888.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF481AECAB8C003B79AD /* 京CX8888.jpg */; };
 		5338AFCE1AECAB8D003B79AD /* 京H99999.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF491AECAB8C003B79AD /* 京H99999.jpg */; };
@@ -174,6 +173,7 @@
 		53EBCCFE1A7B447A002F67C1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53EBCCFA1A7B447A002F67C1 /* UIKit.framework */; };
 		53EBCCFF1A7B447A002F67C1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53EBCCFB1A7B447A002F67C1 /* Foundation.framework */; };
 		53EBCD001A7B447A002F67C1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53EBCCFC1A7B447A002F67C1 /* CoreGraphics.framework */; };
+		FB554A5D1B21959C000A98D1 /* GDSL.txt in Resources */ = {isa = PBXBuildFile; fileRef = FB554A5F1B21959C000A98D1 /* GDSL.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -211,7 +211,6 @@
 		5338AF421AECAB8C003B79AD /* chars_identify.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chars_identify.jpg; sourceTree = "<group>"; };
 		5338AF431AECAB8C003B79AD /* chars_recognise.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chars_recognise.jpg; sourceTree = "<group>"; };
 		5338AF441AECAB8C003B79AD /* chars_segment.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chars_segment.jpg; sourceTree = "<group>"; };
-		5338AF451AECAB8C003B79AD /* GDSL.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GDSL.txt; sourceTree = "<group>"; };
 		5338AF471AECAB8C003B79AD /* 京A88731.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "京A88731.jpg"; sourceTree = "<group>"; };
 		5338AF481AECAB8C003B79AD /* 京CX8888.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "京CX8888.jpg"; sourceTree = "<group>"; };
 		5338AF491AECAB8C003B79AD /* 京H99999.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "京H99999.jpg"; sourceTree = "<group>"; };
@@ -364,6 +363,8 @@
 		53EBCCFA1A7B447A002F67C1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		53EBCCFB1A7B447A002F67C1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		53EBCCFC1A7B447A002F67C1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		FB554A5E1B21959C000A98D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = en.lproj/GDSL.txt; sourceTree = "<group>"; };
+		FB554A601B2195A1000A98D1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text; name = Base; path = Base.lproj/GDSL.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -425,7 +426,7 @@
 				5338AF421AECAB8C003B79AD /* chars_identify.jpg */,
 				5338AF431AECAB8C003B79AD /* chars_recognise.jpg */,
 				5338AF441AECAB8C003B79AD /* chars_segment.jpg */,
-				5338AF451AECAB8C003B79AD /* GDSL.txt */,
+				FB554A5F1B21959C000A98D1 /* GDSL.txt */,
 				5338AF461AECAB8C003B79AD /* general_test */,
 				5338AFBF1AECAB8D003B79AD /* native_test */,
 				5338AFC11AECAB8D003B79AD /* plate_detect.jpg */,
@@ -835,7 +836,7 @@
 				5338B00B1AECAB8D003B79AD /* 皖A2F56D.jpg in Resources */,
 				5338AFEE1AECAB8D003B79AD /* 浙GZB388.jpg in Resources */,
 				5338B0061AECAB8D003B79AD /* 湘GR0L16.jpg in Resources */,
-				5338AFCB1AECAB8D003B79AD /* GDSL.txt in Resources */,
+				FB554A5D1B21959C000A98D1 /* GDSL.txt in Resources */,
 				53CB66CC1A7BF694007B7FEB /* haarcascade_frontalface_default.xml in Resources */,
 				53CB66CA1A7BF694007B7FEB /* ann.xml in Resources */,
 				5338AFFF1AECAB8D003B79AD /* 湘AL8387.jpg in Resources */,
@@ -912,6 +913,15 @@
 				53EBCCE21A7B445E002F67C1 /* Base */,
 			);
 			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+		FB554A5F1B21959C000A98D1 /* GDSL.txt */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FB554A5E1B21959C000A98D1 /* en */,
+				FB554A601B2195A1000A98D1 /* Base */,
+			);
+			name = GDSL.txt;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -998,16 +1008,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					/Users/zhoushiwei/Dropbox/Instant,
-					OpenCV,
-					for,
-					iOS,
-					"[Instant]/SET",
-					1/Chapter06_WorkingWithGallery,
-					"$(PROJECT_DIR)",
-				);
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1027,16 +1027,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					/Users/zhoushiwei/Dropbox/Instant,
-					OpenCV,
-					for,
-					iOS,
-					"[Instant]/SET",
-					1/Chapter06_WorkingWithGallery,
-					"$(PROJECT_DIR)",
-				);
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
