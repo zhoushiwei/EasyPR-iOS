@@ -27,6 +27,6 @@
 
 using namespace std;
 using namespace cv;
-#define projectpath "/Users/zhoushiwei/Dropbox/EasyPR/"
+#define projectpath "."
 #endif
 /* endif __PREP_H__ */

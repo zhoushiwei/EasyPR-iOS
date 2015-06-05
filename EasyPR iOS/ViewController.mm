@@ -201,7 +201,7 @@ CPlateRecognize pr;
     fps.textColor=[UIColor redColor];
     fps.textAlignment=NSTextAlignmentLeft;
    // fps.transform = CGAffineTransformMakeRotation(90);
-    fps.text=@"周";
+    fps.text=@"EasyPR iOS";
     self.textLabel = fps;
     [self.view addSubview:self.textLabel];
     [self.view bringSubviewToFront:self.textLabel];
