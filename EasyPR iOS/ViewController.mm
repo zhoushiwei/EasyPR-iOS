@@ -240,7 +240,7 @@ CPlateRecognize pr;
                                 action:@selector(loadButtonCameraPressed:)];
   
     
-    [toolbar setItems:[NSArray arrayWithObjects:TrainingItem ,flexitem,albumitem,flexitem,cameraitem,
+    [toolbar setItems:[NSArray arrayWithObjects:albumitem,flexitem,cameraitem,
                        nil]];
     [self.view addSubview:toolbar];
     
