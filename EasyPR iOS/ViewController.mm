@@ -12,13 +12,17 @@
 #include "easypr/util/switch.hpp"
 #include "GlobalData.hpp"
 using namespace easypr;
-
-int test_plate_recognize();
-int testMain();
 CPlateRecognize pr;
 
 @interface ViewController ()
-
+{
+    AVCaptureSession * session;
+    AVCaptureSession *captureSession;
+    NSArray * captureDevices;
+    AVCaptureDeviceInput * captureInput;
+    AVCaptureVideoDataOutput * captureOutput;
+    int currentCameraIndex;
+}
 @end
 
 @implementation ViewController
@@ -51,7 +55,7 @@ CPlateRecognize pr;
     UIImage *temp_image=[UIImageCVMatConverter scaleAndRotateImageBackCamera:temp];
     [SVProgressHUD show];
     source_image=[UIImageCVMatConverter cvMatFromUIImage:temp_image];
-    UIImage*plate_uiimage=[self plateRecognition:source_image];
+    [self plateRecognition:source_image];
     imageView.image = temp_image;
     [saveButton setEnabled:YES];
 }
@@ -67,7 +71,35 @@ CPlateRecognize pr;
     }
 }
 
+- (IBAction)CameraButtonPressed:(id)sender {
+    if(!Camera_State){
+        self.m_VideoProcess = [[VideoProcess alloc] init];
+        self.m_VideoProcess.m_captureImageType = MPVideoProcessorCaptureColorImageRGB;
+        [self.m_VideoProcess setupAVCaptureSession];
+        //< higher quality
+        [self.m_VideoProcess.m_avSession setSessionPreset:AVCaptureSessionPreset640x480];
+        [self.m_VideoProcess startAVSessionWithBufferDelegate:self];
+        [self.m_VideoProcess stopAVSession];
+        [self StartCamera];
+    }
+    else {
+        [self StopCamera];
+    }
+}
+
+-(void) StopCamera
+{
+    [self.m_VideoProcess stopAVSession];
+    Camera_State=false;
+}
+
+-(void)StartCamera
+{
+    [self.m_VideoProcess startAVSession];
+    Camera_State=true;
+}
 - (IBAction)loadButtonPressed:(id)sender {
+    [self StopCamera];
     UIImagePickerController* picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
     
@@ -106,6 +138,7 @@ CPlateRecognize pr;
 }
 
 - (IBAction)loadButtonCameraPressed:(id)sender {
+    [self StopCamera];
     UIImagePickerController* picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
     
@@ -161,13 +194,16 @@ CPlateRecognize pr;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    
+    Camera_State=false;
+    
     NSString* bundlePath=[[NSBundle mainBundle] bundlePath];
     std::string mainPath=[bundlePath UTF8String];
     GlobalData::mainBundle()=mainPath;
     
     cout << "test_plate_recognize" << endl;
-    
-    Mat src = imread(mainPath+"/image/test.jpg");
+   
     pr.setLifemode(true);
     pr.setDebug(false);
     pr.setMaxPlates(4);
@@ -211,15 +247,15 @@ CPlateRecognize pr;
                           barMetrics:UIBarMetricsDefault];
     toolbar.delegate=self;
   
-    UIBarButtonItem*TrainingItem= [[UIBarButtonItem alloc]
+    UIBarButtonItem*RealCameraItem= [[UIBarButtonItem alloc]
                                    
-                                   initWithTitle:@"识别"
+                                   initWithTitle:@"实时识别"
                                    
                                    style:UIBarButtonItemStylePlain
                                    
                                    target:self
                                    
-                                   action:@selector(TraningPressed:)];
+                                   action:@selector(CameraButtonPressed:)];
     UIBarButtonItem*flexitem=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem*albumitem=[[UIBarButtonItem alloc]
                                
@@ -240,8 +276,7 @@ CPlateRecognize pr;
                                 action:@selector(loadButtonCameraPressed:)];
   
     
-    [toolbar setItems:[NSArray arrayWithObjects:albumitem,flexitem,cameraitem,
-                       nil]];
+    [toolbar setItems:[NSArray arrayWithObjects:RealCameraItem,flexitem,albumitem,flexitem,cameraitem,nil]];
     [self.view addSubview:toolbar];
     
     // Do any additional setup after loading the view, typically from a nib
@@ -256,7 +291,7 @@ CPlateRecognize pr;
     source_image=imread(image_path);
     resize(source_image, source_image,cv::Size(source_image.cols/2,source_image.rows/2));
     imageView.image=[UIImageCVMatConverter UIImageFromCVMat:source_image];
-    UIImage*plate_uiimage=[self plateRecognition:source_image];
+    [self plateRecognition:source_image];
 }
 
 -(UIImage*)plateRecognition:(cv::Mat&)src
@@ -264,9 +299,10 @@ CPlateRecognize pr;
     UIImage *plateimage;
    
     vector<CPlate> plateVec;
-    
+    double t=cv::getTickCount();
     int result = pr.plateRecognize(src, plateVec);
-    //int result = pr.plateRecognizeAsText(src, plateVec);
+    t=cv::getTickCount()-t;
+    NSLog(@"time %f",t*1000/cv::getTickFrequency());
     if (result == 0) {
         size_t num = plateVec.size();
         for (size_t j = 0; j < num; j++) {
@@ -291,6 +327,66 @@ CPlateRecognize pr;
     [SVProgressHUD dismiss];
     return plateimage;
 }
+
+
+-(void)captureOutput:(AVCaptureOutput *)captureOutput
+didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
+      fromConnection:(AVCaptureConnection *)connection
+{
+//    if(Camera_State){
+    CVImageBufferRef imageBuffer =  CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    
+    uint8_t *baseAddress = (uint8_t *)CVPixelBufferGetBaseAddress(imageBuffer);
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+ 
+    Mat img=Mat((int)height,(int)width,CV_8UC4,baseAddress);
+   
+    cvtColor(img, RGB, COLOR_BGRA2RGB);
+    
+    vector<CPlate> plateVec;
+    double t=cv::getTickCount();
+    int result = pr.plateRecognize(RGB, plateVec);
+    t=cv::getTickCount()-t;
+    NSLog(@"time %f",t*1000/cv::getTickFrequency());
+    if (result == 0) {
+        size_t num = plateVec.size();
+        for (size_t j = 0; j < num; j++) {
+            cout << "plateRecognize: " << plateVec[j].getPlateStr() << endl;
+        }
+    }
+    
+    if (result != 0) cout << "result:" << result << endl;
+    if(plateVec.size()==0){
+        [SVProgressHUD dismiss];
+        [self.textLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"No Plate"] waitUntilDone:NO];
+       
+    }else {
+    string name=plateVec[0].getPlateStr();
+    NSString *resultMessage = [NSString stringWithCString:plateVec[0].getPlateStr().c_str()
+                                                 encoding:NSUTF8StringEncoding];
+    [self.textLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%@",resultMessage] waitUntilDone:NO];
+    }
+    
+//    CGImageRef dstImage = [self.m_VideoProcess createImageRefFromImageBuffer:imageBuffer];
+    
+    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        //  self.imageView.layer.contents = (__bridge id)dstImage;
+        [self showVideoThread];
+    });
+    
+//    CGImageRelease(dstImage);
+   // }
+}
+
+-(void)showVideoThread
+{
+    imageView.image=[UIImageCVMatConverter UIImageFromCVMat:RGB];
+}
+
 
 - (void)didReceiveMemoryWarning
 {

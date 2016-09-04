@@ -12,9 +12,11 @@
 #ifdef __OBJC__
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
+#import "VideoProcess.h"
 #endif
 @interface ViewController : UIViewController<UIImagePickerControllerDelegate,
-UINavigationControllerDelegate, UIPopoverControllerDelegate,UIToolbarDelegate> {
+UINavigationControllerDelegate, UIPopoverControllerDelegate,UIToolbarDelegate,AVCaptureVideoDataOutputSampleBufferDelegate> {
     UIPopoverController *popoverController;
     UIImageView *imageView;
     UIImageView *textView;
@@ -22,7 +24,10 @@ UINavigationControllerDelegate, UIPopoverControllerDelegate,UIToolbarDelegate> {
     UIImage* image;
     cv::CascadeClassifier faceCascade;
     cv::Mat source_image;
+    BOOL Camera_State;
+    cv::Mat RGB;
 }
+@property(nonatomic,retain)VideoProcess *m_VideoProcess;
 @property (nonatomic, retain) UILabel *textLabel;
 @property (nonatomic, retain) IBOutlet UIImageView *imageView;
 @property (nonatomic, retain) IBOutlet UIImageView *textView;

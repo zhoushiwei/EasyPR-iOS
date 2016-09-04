@@ -19,6 +19,7 @@
 		53224D991D7BC8AC00F92C8B /* model in Resources */ = {isa = PBXBuildFile; fileRef = 53224D981D7BC8AC00F92C8B /* model */; };
 		53224D9B1D7BC8BB00F92C8B /* etc in Resources */ = {isa = PBXBuildFile; fileRef = 53224D9A1D7BC8BB00F92C8B /* etc */; };
 		53224D9D1D7BCDB800F92C8B /* image in Resources */ = {isa = PBXBuildFile; fileRef = 53224D9C1D7BCDB800F92C8B /* image */; };
+		53224DA11D7BDECB00F92C8B /* VideoProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 53224DA01D7BDECB00F92C8B /* VideoProcess.m */; };
 		5338AF3A1AECA813003B79AD /* AppIcon29x29@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF341AECA813003B79AD /* AppIcon29x29@2x.png */; };
 		5338AF3B1AECA813003B79AD /* AppIcon29x29@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF351AECA813003B79AD /* AppIcon29x29@3x.png */; };
 		5338AF3C1AECA813003B79AD /* AppIcon40x40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5338AF361AECA813003B79AD /* AppIcon40x40@2x.png */; };
@@ -77,6 +78,8 @@
 		53224D981D7BC8AC00F92C8B /* model */ = {isa = PBXFileReference; lastKnownFileType = folder; name = model; path = resources/model; sourceTree = "<group>"; };
 		53224D9A1D7BC8BB00F92C8B /* etc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = etc; sourceTree = "<group>"; };
 		53224D9C1D7BCDB800F92C8B /* image */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image; path = resources/image; sourceTree = "<group>"; };
+		53224D9F1D7BDECB00F92C8B /* VideoProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoProcess.h; sourceTree = "<group>"; };
+		53224DA01D7BDECB00F92C8B /* VideoProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoProcess.m; sourceTree = "<group>"; };
 		5338AF341AECA813003B79AD /* AppIcon29x29@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon29x29@2x.png"; sourceTree = "<group>"; };
 		5338AF351AECA813003B79AD /* AppIcon29x29@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon29x29@3x.png"; sourceTree = "<group>"; };
 		5338AF361AECA813003B79AD /* AppIcon40x40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon40x40@2x.png"; sourceTree = "<group>"; };
@@ -187,6 +190,15 @@
 			path = xmlParser;
 			sourceTree = "<group>";
 		};
+		53224D9E1D7BDECB00F92C8B /* VideoCamera */ = {
+			isa = PBXGroup;
+			children = (
+				53224D9F1D7BDECB00F92C8B /* VideoProcess.h */,
+				53224DA01D7BDECB00F92C8B /* VideoProcess.m */,
+			);
+			path = VideoCamera;
+			sourceTree = "<group>";
+		};
 		53804A921D72D0F8007C2D7E /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +259,7 @@
 		53EBCCC31A7B445E002F67C1 = {
 			isa = PBXGroup;
 			children = (
+				53224D9E1D7BDECB00F92C8B /* VideoCamera */,
 				53224D9C1D7BCDB800F92C8B /* image */,
 				53224D9A1D7BC8BB00F92C8B /* etc */,
 				53224D981D7BC8AC00F92C8B /* model */,
@@ -424,6 +437,7 @@
 				53804AAB1D72D0F8007C2D7E /* chars_identify.cpp in Sources */,
 				53224D821D7BBE0F00F92C8B /* xmlParser.cpp in Sources */,
 				53D77EA31A7BA23300FE1882 /* UIImageCVMatConverter.mm in Sources */,
+				53224DA11D7BDECB00F92C8B /* VideoProcess.m in Sources */,
 				53804AB01D72D0F8007C2D7E /* params.cpp in Sources */,
 				53804AB41D72D0F8007C2D7E /* plate_locate.cpp in Sources */,
 				53224D801D7BBE0F00F92C8B /* erfilter.cpp in Sources */,
