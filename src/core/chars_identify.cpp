@@ -1,264 +1,367 @@
-#include "../include/chars_identify.h"
-#include "../include/core_func.h"
-/*! \namespace easypr
- Namespace where all the C++ EasyPR functionality resides
- */
-namespace easypr{
-    
-    
-#define NDEBUG
-    
-    //中国车牌
-    const char strCharacters[] = {'0','1','2','3','4','5',\
-        '6','7','8','9','A','B', 'C', 'D', 'E','F', 'G', 'H', /* 没有I */\
-        'J', 'K', 'L', 'M', 'N', /* 没有O */ 'P', 'Q', 'R', 'S', 'T', \
-        'U','V', 'W', 'X', 'Y', 'Z'};
-    const int numCharacter = 34; /* 没有I和0,10个数字与24个英文字符之和 */
-    
-    //以下都是我训练时用到的中文字符数据，并不全面，有些省份没有训练数据所以没有字符
-    //有些后面加数字2的表示在训练时常看到字符的一种变形，也作为训练数据存储
-    const string strChinese[] = {
-        "zh_cuan" /* 川 */, "zh_e" /* 鄂 */,  "zh_gan" /* 赣*/, \
-        "zh_gan1"/*甘*/,"zh_gui"/* 贵 */,"zh_gui1"/* 桂 */,\
-        "zh_hei" /* 黑 */, "zh_hu" /* 沪 */,  "zh_ji" /* 冀 */, \
-        "zh_jin" /* 津 */, "zh_jing" /* 京 */,"zh_jl" /* 吉 */, \
-        "zh_liao" /* 辽 */, "zh_lu" /* 鲁 */, "zh_meng" /* 蒙 */,\
-        "zh_min" /* 闽 */, "zh_ning" /* 宁 */, "zh_qing" /* 青 */,\
-        "zh_qiong" /* 琼 */, "zh_shan" /* 陕 */,"zh_su" /* 苏 */, \
-        "zh_sx" /* 晋 */, "zh_wan" /* 皖 */, "zh_xiang" /* 湘 */,\
-        "zh_xin" /* 新 */,"zh_yu" /* 豫 */,  "zh_yu1" /* 渝 */,\
-        "zh_yue" /* 粤 */, "zh_yun" /* 云 */, "zh_zang" /* 藏 */,\
-        "zh_zhe" /* 浙 */};
-    
-    const int numChinese = 31;
-    const int numAll = 65; /* 34+20=54 */
-    
-    CCharsIdentify::CCharsIdentify()
-    {
-        //cout << "CCharsIdentify" << endl;
-        m_predictSize = 10;
-        m_path = "model/ann.xml";
-        LoadModel();
-        
-        if (m_map.empty())
-        {
-            m_map.insert(pair<string, string>("zh_cuan","川"));
-            
-            m_map.insert(pair<string, string>("zh_e","鄂"));
-            
-            m_map.insert(pair<string, string>("zh_gan","赣"));
-            
-            m_map.insert(pair<string, string>("zh_gan1","甘"));
-            
-            m_map.insert(pair<string, string>("zh_gui","贵"));
-            
-            m_map.insert(pair<string, string>("zh_gui1","桂"));
-            
-            m_map.insert(pair<string, string>("zh_hei","黑"));
-            
-            m_map.insert(pair<string, string>("zh_hu","沪"));
-            
-            m_map.insert(pair<string, string>("zh_ji","冀"));
-            
-            m_map.insert(pair<string, string>("zh_jin","津"));
-            
-            m_map.insert(pair<string, string>("zh_jing","京"));
-            
-            m_map.insert(pair<string, string>("zh_jl","吉"));
-            
-            m_map.insert(pair<string, string>("zh_liao","辽"));
-            
-            m_map.insert(pair<string, string>("zh_lu","鲁"));
-            
-            m_map.insert(pair<string, string>("zh_meng","蒙"));
-            
-            m_map.insert(pair<string, string>("zh_min","闽"));
-            
-            m_map.insert(pair<string, string>("zh_ning","宁"));
-            
-            m_map.insert(pair<string, string>("zh_qing","青"));
-            
-            m_map.insert(pair<string, string>("zh_qiong","琼"));
-            
-            m_map.insert(pair<string, string>("zh_shan","陕"));
-            
-            m_map.insert(pair<string, string>("zh_su","苏"));
-            
-            m_map.insert(pair<string, string>("zh_sx","晋"));
-            
-            m_map.insert(pair<string, string>("zh_wan","皖"));
-            
-            m_map.insert(pair<string, string>("zh_xiang","湘"));
-            
-            m_map.insert(pair<string, string>("zh_xin","新"));
-            
-            m_map.insert(pair<string, string>("zh_yu","豫"));
-            
-            m_map.insert(pair<string, string>("zh_yu1","渝"));
-            
-            m_map.insert(pair<string, string>("zh_yue","粤"));
-            
-            m_map.insert(pair<string, string>("zh_yun","云"));
-            
-            m_map.insert(pair<string, string>("zh_zang","藏"));
-            
-            m_map.insert(pair<string, string>("zh_zhe","浙"));
-        }
+#include "easypr/core/chars_identify.h"
+#include "easypr/core/character.hpp"
+#include "easypr/config.h"
+#include "easypr/core/core_func.h"
+#include "easypr/core/feature.h"
+#include "easypr/core/params.h"
+#include "GlobalData.hpp"
+namespace easypr {
+
+  CharsIdentify* CharsIdentify::instance_ = nullptr;
+
+  CharsIdentify* CharsIdentify::instance() {
+    if (!instance_) {
+      instance_ = new CharsIdentify;
     }
-    
-    
-    void CCharsIdentify::LoadModel()
-    {
-        ann.clear();
-        ann.load(m_path.c_str(), "ann");
+    return instance_;
+  }
+
+  CharsIdentify::CharsIdentify() {
+    std::string mainpath=GlobalData::MainPath;
+    ann_ = ml::ANN_MLP::load<ml::ANN_MLP>(mainpath+"/"+kDefaultAnnPath);
+    annChinese_ = ml::ANN_MLP::load<ml::ANN_MLP>(mainpath+"/"+kChineseAnnPath);
+    kv_ = std::shared_ptr<Kv>(new Kv);
+    kv_->load(mainpath+"/etc/province_mapping");
+  }
+
+  void CharsIdentify::LoadModel(std::string path) {
+    if (path != std::string(kDefaultAnnPath)) {
+
+      if (!ann_->empty())
+        ann_->clear();
+
+      ann_ = ml::ANN_MLP::load<ml::ANN_MLP>(path);
     }
-    
-    void CCharsIdentify::LoadModel(string s)
-    {
-        ann.clear();
-        ann.load(s.c_str(), "ann");
+  }
+
+  void CharsIdentify::LoadChineseModel(std::string path) {
+    if (path != std::string(kChineseAnnPath)) {
+
+      if (!annChinese_->empty())
+        annChinese_->clear();
+
+      annChinese_ = ml::ANN_MLP::load<ml::ANN_MLP>(path);
     }
-    
-    
-    int CCharsIdentify::classify(Mat f, bool isChinses,bool isSpeci){
-        int result = -1;
-        Mat output(1, numAll, CV_32FC1);
-        ann.predict(f, output);//使用ann对字符做判断
-        
-        if (!isChinses)//对中文字符的判断
-        {if(isSpeci)
-        {result = 0;
-            float maxVal = -2;
-            for(int j =10 ; j < numCharacter; j++)
-            {
-                float val = output.at<float>(j);
-                //cout << "j:" << j << "val:"<< val << endl;
-                if (val > maxVal)
-                {
-                    maxVal = val;
-                    result = j;
-                }
-            }
-            
+  }
+
+  void CharsIdentify::classify(cv::Mat featureRows, std::vector<int>& out_maxIndexs, 
+    std::vector<float>& out_maxVals, std::vector<bool> isChineseVec){
+    int rowNum = featureRows.rows;
+
+    cv::Mat output(rowNum, kCharsTotalNumber, CV_32FC1);
+    ann_->predict(featureRows, output);
+
+    for (int output_index = 0; output_index < rowNum; output_index++) {
+      Mat output_row = output.row(output_index);
+      int result = -1;
+      float maxVal = -2.f;
+      bool isChinses = isChineseVec[output_index];
+      if (!isChinses) {
+        result = 0;
+        for (int j = 0; j < kCharactersNumber; j++) {
+          float val = output_row.at<float>(j);
+          // std::cout << "j:" << j << "val:" << val << std::endl;
+          if (val > maxVal) {
+            maxVal = val;
+            result = j;
+          }
         }
-        else{
-            result = 0;
-            float maxVal = -2;
-            for(int j = 0; j < numCharacter; j++)
-            {
-                float val = output.at<float>(j);
-                //cout << "j:" << j << "val:"<< val << endl;
-                if (val > maxVal)//求得中文字符权重最大的那个，也就是通过ann认为最可能的字符
-                {
-                    maxVal = val;
-                    result = j;
-                }
-            }
+      } 
+      else {
+        result = kCharactersNumber;
+        for (int j = kCharactersNumber; j < kCharsTotalNumber; j++) {
+          float val = output_row.at<float>(j);
+          //std::cout << "j:" << j << "val:" << val << std::endl;
+          if (val > maxVal) {
+            maxVal = val;
+            result = j;
+          }
         }
-        }
-        else//对数字和英文字母的判断
-        {
-            
-            result = numCharacter;
-            float maxVal = -2;
-            for(int j = numCharacter; j < numAll; j++)
-            {
-                float val = output.at<float>(j);
-                //cout << "j:" << j << "val:"<< val << endl;
-                if (val > maxVal)
-                {
-                    maxVal = val;
-                    result = j;
-                }
-            }
-            
-        }
-        return result;
+      }
+      out_maxIndexs[output_index] = result;
+      out_maxVals[output_index] = maxVal;
     }
-    
-    int CCharsIdentify::classify(Mat f)
-    {
-        int result = -1;
-        Mat output(1, numAll, CV_32FC1);
-        ann.predict(f, output);//使用ann对字符做判断
-        
-        
-        
-        float maxVal = -2;
-        for(int j = 0; j < numCharacter; j++)
-        {
-            float val = output.at<float>(j);
-            //cout << "j:" << j << "val:"<< val << endl;
-            if (val > maxVal)
-                //求得中文字符权重最大的那个，也就是通过ann认为最可能的字符
-            {
-                maxVal = val;
-                result = j;
-            }
-        }
-        
-        
-        
-        
-        
-        for(int j = numCharacter; j < numAll; j++)
-        {
-            float val = output.at<float>(j);
-            //cout << "j:" << j << "val:"<< val << endl;
-            if (val > maxVal)
-            {
-                maxVal = val;
-                result = j;
-            }
-        }
-        
-        
-        return result;
+  }
+
+
+  void CharsIdentify::classify(std::vector<CCharacter>& charVec){
+    size_t charVecSize = charVec.size();
+
+    if (charVecSize == 0)
+      return;
+
+    Mat featureRows;
+    for (size_t index = 0; index < charVecSize; index++) {
+      Mat charInput = charVec[index].getCharacterMat();
+      Mat feature = charFeatures(charInput, kPredictSize);
+      featureRows.push_back(feature);
     }
-    
-    string CCharsIdentify::charsIdentify(Mat input)
-    {
-        Mat f = features(input, m_predictSize);
-        string result = "";
-        int index = classify(f);//使用ann来判别那个字符
-        
-        if (index >= numCharacter)
-        {
-            string s = strChinese[index - numCharacter];
-            string province = m_map[s];
-            return s;
+
+    cv::Mat output(charVecSize, kCharsTotalNumber, CV_32FC1);
+    ann_->predict(featureRows, output);
+
+    for (size_t output_index = 0; output_index < charVecSize; output_index++) {
+      CCharacter& character = charVec[output_index];
+      Mat output_row = output.row(output_index);
+
+      int result = -1;
+      float maxVal = -2.f;
+      std::string label = "";
+
+      bool isChinses = character.getIsChinese();
+      if (!isChinses) {
+        result = 0;
+        for (int j = 0; j < kCharactersNumber; j++) {
+          float val = output_row.at<float>(j);
+          //std::cout << "j:" << j << "val:" << val << std::endl;
+          if (val > maxVal) {
+            maxVal = val;
+            result = j;
+          }
         }
-        else
-        {
-            char s =  strCharacters[index];
-            char szBuf[216];
-            sprintf(szBuf,"%c",s);
-            return szBuf;
+        label = std::make_pair(kChars[result], kChars[result]).second;
+      }
+      else {
+        result = kCharactersNumber;
+        for (int j = kCharactersNumber; j < kCharsTotalNumber; j++) {
+          float val = output_row.at<float>(j);
+          //std::cout << "j:" << j << "val:" << val << std::endl;
+          if (val > maxVal) {
+            maxVal = val;
+            result = j;
+          }
         }
-        
+        const char* key = kChars[result];
+        std::string s = key;
+        std::string province = kv_->get(s);
+        label = std::make_pair(s, province).second;
+      }
+      /*std::cout << "result:" << result << std::endl;
+      std::cout << "maxVal:" << maxVal << std::endl;*/
+      character.setCharacterScore(maxVal);
+      character.setCharacterStr(label);
     }
-    
-    //输入当个字符Mat,生成字符的string
-    string CCharsIdentify::charsIdentify(Mat input, bool isChinese,bool isSpeci)
-    {
-        Mat f = features(input, m_predictSize);
-        string result = "";
-        int index = classify(f, isChinese,isSpeci);//使用ann来判别那个字符
-        
-        if (!isChinese)
-        {
-            result = result + strCharacters[index];
-        }
-        else
-        {
-            string s = strChinese[index - numCharacter];
-            string province = m_map[s];
-            result = province + result;
-        }
-        
-        return result;
+  }
+
+
+  void CharsIdentify::classifyChinese(std::vector<CCharacter>& charVec){
+    size_t charVecSize = charVec.size();
+
+    if (charVecSize == 0)
+      return;
+
+    Mat featureRows;
+    for (size_t index = 0; index < charVecSize; index++) {
+      Mat charInput = charVec[index].getCharacterMat();
+      Mat feature = charFeatures(charInput, kChineseSize);
+      featureRows.push_back(feature);
     }
-    
-    
-    
-}	/*! \namespace easypr*/
+
+    cv::Mat output(charVecSize, kChineseNumber, CV_32FC1);
+    annChinese_->predict(featureRows, output);
+
+    for (size_t output_index = 0; output_index < charVecSize; output_index++) {
+      CCharacter& character = charVec[output_index];
+      Mat output_row = output.row(output_index);
+      bool isChinese = true;
+
+      float maxVal = -2;
+      int result = -1;
+
+      for (int j = 0; j < kChineseNumber; j++) {
+        float val = output_row.at<float>(j);
+        //std::cout << "j:" << j << "val:" << val << std::endl;
+        if (val > maxVal) {
+          maxVal = val;
+          result = j;
+        }
+      }
+
+      // no match
+      if (-1 == result) {
+        result = 0;
+        maxVal = 0;
+        isChinese = false;
+      }
+
+      auto index = result + kCharsTotalNumber - kChineseNumber;
+      const char* key = kChars[index];
+      std::string s = key;
+      std::string province = kv_->get(s);
+
+      /*std::cout << "result:" << result << std::endl;
+      std::cout << "maxVal:" << maxVal << std::endl;*/
+
+      character.setCharacterScore(maxVal);
+      character.setCharacterStr(province);
+      character.setIsChinese(isChinese);
+    }
+  }
+
+  int CharsIdentify::classify(cv::Mat f, float& maxVal, bool isChinses){
+    int result = -1;
+
+    cv::Mat output(1, kCharsTotalNumber, CV_32FC1);
+    ann_->predict(f, output);
+
+    maxVal = -2.f;
+    if (!isChinses) {
+      result = 0;
+      for (int j = 0; j < kCharactersNumber; j++) {
+        float val = output.at<float>(j);
+        // std::cout << "j:" << j << "val:" << val << std::endl;
+        if (val > maxVal) {
+          maxVal = val;
+          result = j;
+        }
+      }
+    }
+    else {
+      result = kCharactersNumber;
+      for (int j = kCharactersNumber; j < kCharsTotalNumber; j++) {
+        float val = output.at<float>(j);
+        //std::cout << "j:" << j << "val:" << val << std::endl;
+        if (val > maxVal) {
+          maxVal = val;
+          result = j;
+        }
+      }
+    }
+    //std::cout << "maxVal:" << maxVal << std::endl;
+    return result;
+  }
+
+  bool CharsIdentify::isCharacter(cv::Mat input, std::string& label, float& maxVal, bool isChinese) {
+    cv::Mat feature = charFeatures(input, kPredictSize);
+    auto index = static_cast<int>(classify(feature, maxVal, isChinese));
+
+    if (isChinese) {
+      //std::cout << "maxVal:" << maxVal << std::endl;
+    }
+
+
+    float chineseMaxThresh = 0.2f;
+    //float chineseMaxThresh = CParams::instance()->getParam2f();
+
+    if (maxVal >= 0.9 || (isChinese && maxVal >= chineseMaxThresh)) {
+      if (index < kCharactersNumber) {
+        label = std::make_pair(kChars[index], kChars[index]).second;
+      }
+      else {
+        const char* key = kChars[index];
+        std::string s = key;
+        std::string province = kv_->get(s);
+        label = std::make_pair(s, province).second;
+      }
+      return true;
+    }
+    else
+      return false;
+  }
+
+  /*bool CharsIdentify::charsJudge(std::vector<CCharacter>& charVec) {
+    cv::Mat feature = charFeatures(input, kPredictSize);
+    auto index = static_cast<int>(classify(feature, maxVal, isChinese));
+
+    if (isChinese)
+      std::cout << "maxVal:" << maxVal << std::endl;
+
+    if (maxVal >= 0.9) {
+      if (index < kCharactersNumber) {
+        label = std::make_pair(kChars[index], kChars[index]).second;
+      }
+      else {
+        const char* key = kChars[index];
+        std::string s = key;
+        std::string province = kv_->get(s);
+        label = std::make_pair(s, province).second;
+      }
+      return true;
+    }
+    else
+      return false;
+  }*/
+
+  std::pair<std::string, std::string> CharsIdentify::identifyChinese(cv::Mat input, float& out, bool& isChinese) {
+    cv::Mat feature = charFeatures(input, kChineseSize);
+    float maxVal = -2;
+
+    int result = -1;
+
+    cv::Mat output(1, kChineseNumber, CV_32FC1);
+    annChinese_->predict(feature, output);
+
+    for (int j = 0; j < kChineseNumber; j++) {
+      float val = output.at<float>(j);
+      //std::cout << "j:" << j << "val:" << val << std::endl;
+      if (val > maxVal) {
+        maxVal = val;
+        result = j;
+      }
+    }
+
+    // no match
+    if (-1 == result) {
+      result = 0;
+      maxVal = 0;
+      isChinese = false;
+    }
+    else if (maxVal > 0.9){
+      isChinese = true;
+    }
+
+    auto index = result + kCharsTotalNumber - kChineseNumber;
+    const char* key = kChars[index];
+    std::string s = key;
+    std::string province = kv_->get(s);
+
+    out = maxVal;
+
+    return std::make_pair(s, province);
+  }
+
+
+  std::pair<std::string, std::string> CharsIdentify::identify(cv::Mat input, bool isChinese) {
+    cv::Mat feature = charFeatures(input, kPredictSize);
+    float maxVal = -2;
+    auto index = static_cast<int>(classify(feature, maxVal, isChinese));
+    if (index < kCharactersNumber) {
+      return std::make_pair(kChars[index], kChars[index]);
+    }
+    else {
+      const char* key = kChars[index];
+      std::string s = key;
+      std::string province = kv_->get(s);
+      return std::make_pair(s, province);
+    }
+  }
+
+  int CharsIdentify::identify(std::vector<cv::Mat> inputs, std::vector<std::pair<std::string, std::string>>& outputs,
+    std::vector<bool> isChineseVec) {
+    Mat featureRows;
+    size_t input_size = inputs.size();
+    for (size_t i = 0; i < input_size; i++) {
+      Mat input = inputs[i];
+      cv::Mat feature = charFeatures(input, kPredictSize);
+      featureRows.push_back(feature);
+    }
+
+    std::vector<int> maxIndexs;
+    std::vector<float> maxVals;
+    classify(featureRows, maxIndexs, maxVals, isChineseVec);
+
+    for (size_t row_index = 0; row_index < input_size; row_index++) {
+      int index = maxIndexs[row_index];
+      if (index < kCharactersNumber) {
+        outputs[row_index] = std::make_pair(kChars[index], kChars[index]);
+      }
+      else {
+        const char* key = kChars[index];
+        std::string s = key;
+        std::string province = kv_->get(s);
+        outputs[row_index] = std::make_pair(s, province);
+      }
+    }
+    return 0;
+  }
+}

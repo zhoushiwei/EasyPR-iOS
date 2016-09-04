@@ -8,26 +8,15 @@
 #import "ViewController.h"
 #import "UIImageCVMatConverter.h"
 #import "SVProgressHUD.h"
-#include "../include/plate_locate.h"
-#include "../include/plate_judge.h"
-#include "../include/chars_segment.h"
-#include "../include/chars_identify.h"
-
-#include "../include/plate_detect.h"
-#include "../include/chars_recognise.h"
-
-#include "../include/plate_recognize.h"
+#include "easypr.h"
+#include "easypr/util/switch.hpp"
+#include "GlobalData.hpp"
 using namespace easypr;
 
-int test_plate_locate();
-int test_plate_judge();
-int test_chars_segment();
-int test_chars_identify();
-int test_plate_detect();
-int test_chars_recognise();
 int test_plate_recognize();
 int testMain();
 CPlateRecognize pr;
+
 @interface ViewController ()
 
 @end
@@ -172,15 +161,20 @@ CPlateRecognize pr;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSString *ann_ns=[[NSBundle mainBundle]pathForResource:@"ann" ofType:@"xml"];
-    NSString *svm_ns=[[NSBundle mainBundle]pathForResource:@"svm" ofType:@"xml"];
-    string annpath=[ann_ns UTF8String];
-    string svmpath=[svm_ns UTF8String];
-    pr.LoadANN(annpath);
-    pr.LoadSVM(svmpath);
+    NSString* bundlePath=[[NSBundle mainBundle] bundlePath];
+    std::string mainPath=[bundlePath UTF8String];
+    GlobalData::mainBundle()=mainPath;
     
+    cout << "test_plate_recognize" << endl;
+    
+    Mat src = imread(mainPath+"/image/test.jpg");
     pr.setLifemode(true);
     pr.setDebug(false);
+    pr.setMaxPlates(4);
+    //pr.setDetectType(PR_DETECT_COLOR | PR_DETECT_SOBEL);
+    pr.setDetectType(easypr::PR_DETECT_CMSER);
+    
+    
     CGRect bounds = [UIScreen mainScreen].bounds;
     imageView = [[UIImageView alloc] init];
     imageView.frame = CGRectMake(0, 0, bounds.size.width, bounds.size.height);
@@ -268,23 +262,28 @@ CPlateRecognize pr;
 -(UIImage*)plateRecognition:(cv::Mat&)src
 {
     UIImage *plateimage;
-    vector<string> plateVec;
+   
+    vector<CPlate> plateVec;
     
     int result = pr.plateRecognize(src, plateVec);
-    if (result == 0)
-    {
-        int num = (int)plateVec.size();
-        for (int j = 0; j < num; j++)
-        {
-            cout << "plateRecognize: " << plateVec[j] << endl;
+    //int result = pr.plateRecognizeAsText(src, plateVec);
+    if (result == 0) {
+        size_t num = plateVec.size();
+        for (size_t j = 0; j < num; j++) {
+            cout << "plateRecognize: " << plateVec[j].getPlateStr() << endl;
         }
     }
-    printf("%s",plateVec[0].c_str());
-    NSString *errorMessage = [NSString stringWithCString:plateVec[0].c_str()
+    
+    if (result != 0) cout << "result:" << result << endl;
+    if(plateVec.size()==0){
+        [SVProgressHUD dismiss];
+        [self.textLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"No Plate"] waitUntilDone:NO];
+        return plateimage;
+    }
+    string name=plateVec[0].getPlateStr();
+    NSString *resultMessage = [NSString stringWithCString:plateVec[0].getPlateStr().c_str()
                                                 encoding:NSUTF8StringEncoding];
-    NSLog(@"%@",errorMessage);
-  //  NSString* string2 = [plateVec[0].c_str() stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    [self.textLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%@",errorMessage] waitUntilDone:NO];
+    [self.textLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%@",resultMessage] waitUntilDone:NO];
   
     
     if (result != 0)
